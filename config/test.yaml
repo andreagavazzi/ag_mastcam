@@ -1,0 +1,28 @@
+
+joint_state_controller:
+  type: joint_state_controller/JointStateController
+  publish_rate: 10
+
+head_controller:
+  type: position_controllers/JointTrajectoryController
+  joints:
+    - pan_joint
+
+
+dynamixel_control:
+  serial_interface: /dev/ttyUSB0
+  loop_frequency: 500
+  cycle_time_error_threshold: 0.05
+  baudrate: 1000000 # in bauds
+  read_timeout: 0.005 # in seconds
+  scan_timeout: 0.005 # in seconds
+  # Configuration of the servos
+  servos:
+    pan_joint:
+      # hardware ID of the actuator
+      id: 1
+      offset: 0.0
+
+
+  # default mode
+  default_command_interface: position

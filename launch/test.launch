@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="sim" default="false"
+         doc="When set to true the hardware interface is disabled."/>
+
+  <!-- Parameters for the hardware interface and controllers -->
+  <rosparam file="$(find ag_mastcam)/config/test.yaml"/>
+
+  <!-- Load URDF robot description in parameters -->
+  <param name="robot_description" command="cat $(find ag_mastcam)/urdf/test.urdf" />
+
+  <!-- Publish robot's state in the tf tree -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="rob_state_pub" />
+
+  <!-- Load rviz workspace -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find ag_mastcam)/config/mastcam.rviz" required="true" /> 
+
+  <!-- When sim=true is given it loads the GUI for controlling the joints in rviz -->
+  <node if="$(arg sim)" name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
+
+
+  <!-- If sim = false -->
+  <group unless="$(arg sim)">
+
+    <!-- launch our hardware interface -->
+    <arg name="protocol_version" default="p1"/>
+    <node pkg="dynamixel_control_hw"
+          type="dynamixel_control_$(arg protocol_version)"
+          name="dynamixel_control" output="screen" clear_params="true"
+          required="true"/>
+
+    <!-- Start the controller -->
+    <node name="controller" pkg="controller_manager" type="spawner"
+          respawn="false" output="screen" clear_params="true"
+          args="/head_controller
+                /joint_state_controller" />
+                
+  </group>
+
+
+</launch>

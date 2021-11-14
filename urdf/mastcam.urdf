@@ -1,0 +1,116 @@
+<robot name="mastcam">
+
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 -1.5708"/>
+      <geometry>
+        <mesh filename="package://ag_mastcam/meshes/link_1.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="Grey">
+        <color rgba="0.9 0.9 0.8 1.0"/>
+      </material>
+    </visual>
+  </link>
+  
+  <link name="link_1">
+    <visual>
+      <origin xyz="0 0 -0.049" rpy="0 0 1.5708"/>
+      <geometry>
+        <mesh filename="package://ag_mastcam/meshes/link_2.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="Grey">
+        <color rgba="0.9 0.9 0.8 1.0"/>
+      </material>
+    </visual>
+  </link>
+
+  <link name="link_2">
+    <visual>
+      <origin xyz="0.0716 0 0" rpy="0 1.5708 3.14159"/>
+      <geometry>
+        <mesh filename="package://ag_mastcam/meshes/link_3.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="Grey">
+        <color rgba="0.9 0.9 0.8 1.0"/>
+      </material>
+    </visual>
+  </link>
+
+  <link name="camera_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.01" length="0.025"/>
+      </geometry>  
+    </visual>
+  </link>
+
+
+  <joint name="pan_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="link_1"/>
+    <origin xyz="0 0 0.049" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+
+    <!-- Joint limits -->
+    <limit lower="-2.3561" upper="2.3561" velocity="11.5" effort="100"/>
+    <!-- Soft limits -->
+    <safety_controller k_position="1"
+                    k_velocity="1000"
+                    soft_lower_limit="-2.3561"
+                    soft_upper_limit="2.3561" />
+
+  </joint>
+
+  <joint name="tilt_joint" type="revolute">
+    <parent link="link_1"/>
+    <child link="link_2"/>
+    <origin xyz="0 0 0.026" rpy="1.5708 1.5708 0"/>
+    <axis xyz="0 0 1"/>
+
+    <!-- Joint limits -->
+    <limit lower="-1.04719" upper="0.78539" velocity="11.5" effort="100"/>
+    <!-- Soft limits -->
+    <safety_controller k_position="1"
+                    k_velocity="1000"
+                    soft_lower_limit="-1.04719"
+                    soft_upper_limit="0.78539" />
+
+  </joint>
+
+  <joint name="camera_joint" type="fixed">
+    <parent link="link_2"/>
+    <child link="camera_link"/>
+    <origin xyz="-0.056 0 0" rpy="3.14159 -1.5708 1.5708"/>
+  </joint>
+
+
+<!-- ##########################################################################-->
+<!-- Head Transmissions -->
+<!-- ##########################################################################-->
+
+<transmission name="pan_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="pan_joint">
+        <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="pan_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+</transmission>
+
+<transmission name="tilt_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="tilt_joint">
+        <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="tilt_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+</transmission>
+ 
+</robot>
